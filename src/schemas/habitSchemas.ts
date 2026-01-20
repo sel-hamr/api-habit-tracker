@@ -24,7 +24,14 @@ export const updateHabitSchema = z.object({
 export const uuidSchema = z.object({
   id: z.string().uuid('Invalid habit ID format'),
 })
+export const tagIdSchema = z.object({
+  tagId: z.string().uuid('Invalid tag ID format'),
+})
 
 export const completeHabitSchema = z.object({
   note: z.string().max(500).optional(),
+})
+
+export const addTagsToHabitSchema = z.object({
+  tagIds: z.array(z.uuid()).min(1, 'At least one tag ID is required'),
 })

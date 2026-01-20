@@ -1,9 +1,7 @@
 import type { Request, Response } from 'express'
-import bcrypt from 'bcrypt'
 import { db } from '../db/connection.ts'
 import { users } from '../db/schema.ts'
 import { comparePassword, hashPassword } from '../utils/passwords.ts'
-import { email } from 'zod'
 import { generateToken } from '../utils/jwt.ts'
 import { eq } from 'drizzle-orm'
 

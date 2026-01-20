@@ -200,3 +200,58 @@ export const completeHabit = async (
     res.status(500).json({ error: 'Failed to complete habit' })
   }
 }
+
+export const getHabitsByTag = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+    const { tagId } = req.params
+    const userId = req.user?.id
+    const habitsByTag = await db.query.habits.findMany({
+      where: and(eq(habits.userId, userId), eq(habitTags.tagId, tagId)),
+      with: {
+        habitTags: {
+          with: {
+            tag: true,
+          },
+        },
+      },
+    })
+    const habitsWithTags = habitsByTag.map((habit) => ({
+      ...habit,
+      tags: habit.habitTags.map((tag) => tag.tag),
+      habitTags: undefined,
+    }))
+    res.json({ habits: habitsWithTags })
+  } catch (error) {
+    console.error('Get habits by tag error:', error)
+    res.status(500).json({ error: 'Failed to fetch habits by tag' })
+  }
+}
+
+export const addTagsToHabit = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+    const userId = req.user.id
+    const { id } = req.params
+    const { tagIds } = req.body
+    const isUserHavingHabit = await db.query.habits.findFirst({
+      where: and(eq(habits.id, id), eq(habits.userId, userId)),
+    })
+    if (!isUserHavingHabit) {
+      return res.status(404).json({ error: 'Habit not found for user' })
+    }
+    const tags = tagIds.map((tagId) => ({
+      tagId,
+      habitId: id,
+    }))
+    await db.insert(habitTags).values(tags)
+    res.status(200).json({ message: 'Tags added to habit successfully', tags })
+  } catch (error) {
+    console.error('Add tags to habit error:', error)
+    res.status(500).json({ error: 'Failed to add tags to habit' })
+  }
+}
