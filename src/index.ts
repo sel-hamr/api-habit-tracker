@@ -1,6 +1,16 @@
-import { app } from './server.ts'
-import { env } from '../env.ts'
+import { env, isDev } from '../env.ts'
 
-app.listen(env.PORT, () => {
-  console.log(`server runnign on port: ${env.PORT}`)
-})
+async function start() {
+  if (isDev()) {
+    const { app } = await import('./server.ts')
+    app.listen(env.PORT, () => {
+      console.log(`Dev server running on port: ${env.PORT}`)
+    })
+  } else {
+    // Production: cluster mode
+    const { startCluster } = await import('./utils/cluster.ts')
+    await startCluster()
+  }
+}
+
+start().catch(console.error)
