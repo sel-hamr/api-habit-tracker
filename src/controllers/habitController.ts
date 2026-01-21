@@ -3,6 +3,7 @@ import type { AuthenticatedRequest } from '../middleware/auth.ts'
 import { db } from '../db/connection.ts'
 import { habits, habitTags } from '../db/schema.ts'
 import { eq, and, desc } from 'drizzle-orm'
+import { sendResponse } from '../utils/responseFormatter.ts'
 
 export const createHabit = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -242,16 +243,21 @@ export const addTagsToHabit = async (
       where: and(eq(habits.id, id), eq(habits.userId, userId)),
     })
     if (!isUserHavingHabit) {
-      return res.status(404).json({ error: 'Habit not found for user' })
+      return sendResponse(res, false, 'Habit not found', 404)
     }
     const tags = tagIds.map((tagId) => ({
       tagId,
       habitId: id,
     }))
     await db.insert(habitTags).values(tags)
-    res.status(200).json({ message: 'Tags added to habit successfully', tags })
+    return sendResponse(
+      res,
+      true,
+      { message: 'Tags added to habit successfully', tags },
+      200,
+    )
   } catch (error) {
     console.error('Add tags to habit error:', error)
-    res.status(500).json({ error: 'Failed to add tags to habit' })
+    return sendResponse(res, false, 'Failed to add tags to habit', 500)
   }
 }

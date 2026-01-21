@@ -5,6 +5,7 @@ import env from '../../env.ts'
 const numCPUs = os.cpus().length
 
 export async function startCluster() {
+  cluster.schedulingPolicy = cluster.SCHED_RR
   if (cluster.isPrimary) {
     console.log(`Primary ${process.pid} is running`)
     console.log(`Forking ${numCPUs} workers...`)

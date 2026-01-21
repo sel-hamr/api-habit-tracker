@@ -4,6 +4,7 @@ import db from '../db/connection.ts'
 import type { Response } from 'express'
 
 import type { AuthenticatedRequest } from '../middleware/auth.ts'
+import { sendResponse } from '../utils/responseFormatter.ts'
 
 export const getUsers = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -17,12 +18,12 @@ export const getUsers = async (req: AuthenticatedRequest, res: Response) => {
       },
     })
     if (!users) {
-      return res.status(404).json({ error: 'No users found' })
+      return sendResponse(res, false, 'No users found', 404)
     }
     res.status(200).json({ users })
   } catch (error) {
     console.error('Get users error:', error)
-    res.status(500).json({ error: 'Failed to fetch users' })
+    return sendResponse(res, false, 'Failed to fetch users', 500)
   }
 }
 
@@ -40,13 +41,13 @@ export const getUserById = async (req: AuthenticatedRequest, res: Response) => {
       },
     })
     if (!user) {
-      return res.status(404).json({ error: 'User not found' })
+      return sendResponse(res, false, 'User not found', 404)
     }
     user.password = undefined
     res.status(200).json({ user })
   } catch (error) {
     console.error('Get user by ID error:', error)
-    res.status(500).json({ error: 'Failed to fetch user' })
+    return sendResponse(res, false, 'Failed to fetch user', 500)
   }
 }
 export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
@@ -64,12 +65,12 @@ export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
       .where(and(eq(users.id, id), eq(users.id, req.user?.id)))
       .returning()
     if (!updatedUser) {
-      return res.status(404).json({ error: 'User not found' })
+      return sendResponse(res, false, 'User not found', 404)
     }
     res.status(200).json({ user: updatedUser })
   } catch (error) {
     console.error('Update user error:', error)
-    res.status(500).json({ error: 'Failed to update user' })
+    return sendResponse(res, false, 'Failed to update user', 500)
   }
 }
 
@@ -81,13 +82,11 @@ export const deleteUser = async (req: AuthenticatedRequest, res: Response) => {
       .where(and(eq(users.id, id), eq(users.id, req.user?.id)))
       .returning()
     if (!deletedUser) {
-      return res.status(404).json({ error: 'User not found' })
+      return sendResponse(res, false, 'User not found', 404)
     }
-    res.json({
-      message: 'User deleted successfully',
-    })
+    return sendResponse(res, true, 'User deleted successfully', 200)
   } catch (error) {
     console.error('Delete user error:', error)
-    res.status(500).json({ error: 'Failed to delete user' })
+    return sendResponse(res, false, 'Failed to delete user', 500)
   }
 }

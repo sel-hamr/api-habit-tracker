@@ -15,16 +15,21 @@ app.use(express.urlencoded({ extended: true }))
 app.use(
   morgan('dev', {
     skip: () => isTest(),
-  })
+  }),
 )
 
 app.get('/health', (req, res) => {
-  res.send('<button>another</button>')
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() })
 })
 
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/habits', habitRoutes)
+
+app.use((error, req, res, next) => {
+  console.error(error)
+  res.status(500).json({ error: 'Something went wrong!' })
+})
 
 export { app }
 
