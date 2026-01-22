@@ -25,6 +25,8 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32, 'Must be 32 chars long'),
   JWT_EXPIRES_IN: z.string().default('7d'),
   BCRYPT_ROUNDS: z.coerce.number().min(10).max(20).default(12),
+  REDIS_HOST: z.string().default('127.0.0.1'),
+  REDIS_PORT: z.coerce.number().positive().default(6379),
 })
 
 export type Env = z.infer<typeof envSchema>

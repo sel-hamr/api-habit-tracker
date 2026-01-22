@@ -1,6 +1,14 @@
 import { env, isDev } from '../env.ts'
+import { initializeRedisClient } from './config/redis.ts'
+
+let redisInitialized = false
 
 async function start() {
+  if (!redisInitialized) {
+    await initializeRedisClient()
+    redisInitialized = true
+  }
+
   if (isDev()) {
     const { app } = await import('./server.ts')
     app.listen(env.PORT, () => {
