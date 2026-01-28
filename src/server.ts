@@ -2,6 +2,7 @@ import express from 'express'
 import authRoutes from './routes/authRoutes.ts'
 import userRoutes from './routes/userRoutes.ts'
 import habitRoutes from './routes/habitRoutes.ts'
+import tagRoutes from './routes/tagRoutes.ts'
 import cors from 'cors'
 import morgan from 'morgan'
 import helmet from 'helmet'
@@ -27,6 +28,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/habits', habitRoutes)
+app.use('/api/tags', tagRoutes)
 
 app.use((error, req, res, next) => {
   console.error(error)

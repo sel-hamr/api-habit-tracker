@@ -122,3 +122,6 @@ export const insertUserSchema = createInsertSchema(users)
 export const selectUserSchema = createSelectSchema(users)
 
 export const insertHabitSchema = createInsertSchema(habits)
+
+export const insertTagSchema = createInsertSchema(tags)
+export const selectTagSchema = createSelectSchema(tags)
